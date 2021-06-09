@@ -1,0 +1,46 @@
+version: '3.7'
+
+services:
+  hydra-mysql:
+    image: mysql:5.7
+    container_name: hydra-mysql
+    ports:
+      - "3307:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+      - MYSQL_DATABASE=hydra
+    volumes:
+      - "./mysql:/var/lib/mysql"
+    networks:
+      - intranet
+
+  # hydra-migrate:
+    # image: oryd/hydra:v1.10.2
+    # container_name: hydra-mysql-migrate
+    # environment:
+      # - DSN=mysql://root:123456@tcp(hydra-mysql:3306)/hydra?max_conns=20&max_idle_conns=4
+    # command:
+      # migrate sql --yes -e
+    # depends_on:
+      # - hydra-mysql
+    # networks:
+      # - intranet
+
+  hydra:
+    image: oryd/hydra:v1.10.2
+    container_name: hydra
+    ports:
+      - "4444:4444" # Public port
+      - "4445:4445" # Admin port
+      - "5555:5555" # Port for hydra token user
+    command:
+      serve all --dangerous-force-http
+    environment:
+      - DSN=mysql://root:123456@tcp(hydra-mysql:3306)/hydra?max_conns=20&max_idle_conns=4
+      - URLS_CONSENT=http://127.0.0.1:9000/consent
+      - URLS_LOGIN=http://127.0.0.1:9000/login
+    networks:
+      - intranet
+
+networks:
+  intranet:
