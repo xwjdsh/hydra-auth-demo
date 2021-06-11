@@ -12,12 +12,10 @@
 <form method="POST" action="/login?login_challenge={{.LoginChallenge}}">
     <input type="text" name="username">
     <input type="password" name="password">
+    {{ .csrfField }}
+
     <input type="submit">
 </form>
-
-<p>
-    To sign in, use the credentials "buzz:lightyear"
-</p>
 
 </body>
 </html>
